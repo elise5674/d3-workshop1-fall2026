@@ -3,7 +3,7 @@
 // ============================================================================
 // Scales convert data values → visual properties (position, size, color)
 
-// Linear Scale: numbers -> numbers
+// Linear Scale: numbers -> numbers (function that maps data to the pictures on the screen.)
 const xScale = d3.scaleLinear()
     .domain([0, 100]) // Input data range. Here we are saying our data goes from 0 to 100 (you can adjust this based on your data)
     .range([0, 400]); // Output pixel range. This means we want to map our data to a range of 0 to 400 pixels (the width of our SVG)
