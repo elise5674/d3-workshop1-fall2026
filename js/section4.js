@@ -21,7 +21,7 @@ const barHeight = 380 - barMargin.top - barMargin.bottom;
 const barSvg = d3.select('#demo-4')
     .append('svg')
     .attr('viewBox', `0 0 ${barWidth + barMargin.left + barMargin.right} ${barHeight + barMargin.top + barMargin.bottom}`)
-    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .attr('preserveAspectRatio', 'xMidYMid meet') //Chart scales based on size of browser window
     .append('g')
     .attr('transform', `translate(${barMargin.left},${barMargin.top})`);
 
@@ -92,6 +92,10 @@ barSvg.append('text')
     .style('font-size', '12px')
     .text('Electricity Price (per kWh)');
 
+
+
+
+
 // TODO: Create Bar Chart that shows the top 15 states by gas price;
 // States should be on the y-axis and gas price on the x-axis, i.e. bars should be horizontal;
 // make the bars orange; add a title and axis labels.
@@ -106,19 +110,75 @@ const hBarMargin = { top: 30, right: 30, bottom: 80, left: 150 };
 const hBarWidth = 400 - hBarMargin.left - hBarMargin.right;
 const hBarHeight = 500 - hBarMargin.top - hBarMargin.bottom;
 
+
 // Create SVG for horizontal bar chart
+const hBarSvg = d3.select('#demo-4')
+    .append('svg')
+    .attr('width', hBarWidth + hBarMargin.left + hBarMargin.right)
+    .attr('height', hBarHeight + hBarMargin.top + hBarMargin.bottom)
+    .append('g')
+    .attr('transform', `translate(${hBarMargin.left}, ${hBarMargin.top})`);
 
 
 // Create scales for the horizontal bar chart
+const xHBarScale = d3.scaleLinear()
+    .domain([0, d3.max(top15Gas, d => d.gas)]) // Input: from 0 to max gas price in top 15
+    .range([0, hBarWidth]); // Output: width of the chart
+
+const yHBarScale = d3.scaleBand()
+    .domain(top15Gas.map(d => d.state)) // Input: state names
+    .range([0, hBarHeight]) // Output: height of the chart
+    .padding(0.25); // Padding between bars
 
 
 // Create axes and append them to the svg
+const xHAxis = d3.axisBottom(xHBarScale)
+    .ticks(5); // Number of ticks on the x-axis
 
+hBarSvg.append('g')
+    .attr('transform', `translate(0, ${hBarHeight})`)
+    .call(xHAxis);
+
+const yHAxis = d3.axisLeft(yHBarScale)
+    .ticks(15); // Number of ticks on the y-axis
+
+
+hBarSvg.append('g')
+    .call(yHAxis);
 
 // Create and append bars to the chart
-
+hBarSvg.selectAll('rect')
+    .data(top15Gas)
+    .enter()
+    .append('rect')
+    .attr('x', 0)
+    .attr('y', d => yHBarScale(d.state))
+    .attr('width', d => xHBarScale(d.gas))
+    .attr('height', yHBarScale.bandwidth())
+    .attr('fill', 'orange');
 
 // Chart title
-
+hBarSvg.append('text')
+    .attr('x', hBarWidth / 2)
+    .attr('y', -10)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '16px')
+    .style('font-weight', 'bold')
+    .text('Top 15 States by Gas Price');
 
 // X axis label
+hBarSvg.append('text')
+    .attr('x', hBarWidth / 2)
+    .attr('y', hBarHeight + 40)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '12px')
+    .text('Gas Price (per gallon)');
+
+// Y axis label
+hBarSvg.append('text')
+    .attr('transform', 'rotate(-90)')
+    .attr('x', -hBarHeight / 2)
+    .attr('y', -120)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '12px')
+    .text('State');
